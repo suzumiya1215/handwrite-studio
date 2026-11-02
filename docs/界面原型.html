@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>手写字迹填充器 · 界面原型 v1.0</title>
+<style>
+:root{
+  --primary:#2F6FED; --primary-d:#1F55C9; --primary-l:#EAF1FE;
+  --ok:#22A06B; --warn:#E8A33D; --danger:#D94A4A;
+  --ink:#1F2329; --ink2:#646A73; --ink3:#8F959E;
+  --bg:#FFFFFF; --side:#F5F6F8; --line:#E4E6EB; --line2:#EDEFF2;
+  --radius-s:6px; --radius-m:10px;
+  --shadow:0 2px 8px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;
+  font-size:14px; color:var(--ink); background:#E9EBEF;
+  -webkit-font-smoothing:antialiased; line-height:1.6;
+}
+/* ---------- 原型外壳 ---------- */
+.proto-bar{
+  position:sticky; top:0; z-index:100; background:#22262E; color:#fff;
+  padding:10px 20px; display:flex; align-items:center; gap:16px;
+  box-shadow:0 2px 10px rgba(0,0,0,.2);
+}
+.proto-bar .brand{font-weight:600;font-size:15px;letter-spacing:.5px}
+.proto-bar .brand small{font-weight:400;color:#9AA1AC;margin-left:8px;font-size:12px}
+.proto-tabs{display:flex;gap:6px;margin-left:auto}
+.proto-tabs button{
+  background:transparent; color:#B9BFC9; border:1px solid #3A404A;
+  padding:6px 14px; border-radius:var(--radius-s); cursor:pointer;
+  font-family:inherit; font-size:13px; transition:.15s;
+}
+.proto-tabs button:hover{background:#2E333C;color:#fff}
+.proto-tabs button.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.stage{max-width:1420px;margin:0 auto;padding:24px 20px 60px}
+.screen{display:none}
+.screen.on{display:block}
+.screen-title{color:#fff;margin-bottom:14px}
+.screen-title h2{font-size:18px;font-weight:600;color:#fff}
+.screen-title p{font-size:13px;color:#B9BFC9;margin-top:2px}
+.win{
+  background:var(--bg); border-radius:var(--radius-m); overflow:hidden;
+  box-shadow:0 8px 30px rgba(0,0,0,.18);
+}
+
+/* ---------- 通用控件 ---------- */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  height:32px; padding:0 14px; border-radius:var(--radius-s);
+  border:1px solid var(--line); background:#fff; color:var(--ink);
+  font-family:inherit; font-size:13px; cursor:pointer; transition:.15s;
+  white-space:nowrap;
+}
+.btn:hover{border-color:#C9CDD4;background:#FAFBFC}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.primary:hover{background:var(--primary-d);border-color:var(--primary-d)}
+.btn.lg{height:40px;padding:0 22px;font-size:14px}
+.btn.danger{color:var(--danger);border-color:#F0C9C9}
+.btn.danger:hover{background:#FDF3F3}
+.btn.ghost{border-color:transparent;color:var(--ink2)}
+.btn.ghost:hover{background:var(--side);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.input{
+  height:30px; padding:0 9px; border:1px solid var(--line); border-radius:var(--radius-s);
+  font-family:inherit; font-size:13px; color:var(--ink); background:#fff;
+  width:100%; outline:none; transition:.15s;
+}
+.input:focus{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-l)}
+.tag{
+  display:inline-block; padding:1px 8px; border-radius:10px; font-size:12px;
+  background:var(--side); color:var(--ink2);
+}
+.tag.ok{background:#E8F6EF;color:var(--ok)}
+.tag.warn{background:#FCF3E4;color:var(--warn)}
+.mono{font-family:Consolas,"Courier New",monospace}
+
+/* ---------- 首页 ---------- */
+.home{padding:0 0 40px}
+.home-hero{
+  padding:56px 24px 40px; text-align:center;
+  background:linear-gradient(180deg,#F7F9FC 0%,#FFFFFF 100%);
+  border-bottom:1px solid var(--line2);
+}
+.home-hero h1{font-size:32px;font-weight:600;letter-spacing:6px;color:var(--ink)}
+.home-hero p{margin-top:10px;color:var(--ink2);font-size:15px;letter-spacing:1px}
+.home-cards{
+  display:grid; grid-template-columns:1.25fr 1fr 1fr; gap:18px;
+  padding:28px 32px 0;
+}
+.card{
+  border:1px solid var(--line); border-radius:var(--radius-m);
+  padding:20px; background:#fff; transition:.18s; position:relative;
+}
+.card:hover{box-shadow:var(--shadow);border-color:#D3D6DB}
+.card .step{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;border-radius:50%;background:var(--primary-l);
+  color:var(--primary);font-weight:600;font-size:14px;margin-bottom:12px;
+}
+.card.hero-card{border-color:#C7DAFB;background:linear-gradient(180deg,#FBFDFF,#fff)}
+.card h3{font-size:16px;font-weight:600;margin-bottom:6px}
+.card .desc{color:var(--ink2);font-size:13px;min-height:40px}
+.card .actions{margin-top:16px;display:flex;gap:8px;align-items:center}
+.font-mini{
+  display:flex;gap:10px;align-items:center;padding:10px;background:var(--side);
+  border-radius:var(--radius-s);margin-top:10px;
+}
+.font-mini .thumb{
+  width:52px;height:52px;border-radius:var(--radius-s);background:#fff;
+  border:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);
+  place-items:center;font-size:13px;color:#444;font-family:"KaiTi","STKaiti",serif;
+  overflow:hidden;flex-shrink:0;
+}
+.font-mini .meta{font-size:12px;color:var(--ink2);line-height:1.7}
+.font-mini .meta b{color:var(--ink);font-size:13px;font-weight:600}
+.recent-list{margin-top:10px;border-top:1px solid var(--line2);padding-top:10px}
+.recent-list .row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 9px;border-radius:var(--radius-s);cursor:pointer;font-size:13px;
+}
+.recent-list .row:hover{background:var(--side)}
+.recent-list .row span:last-child{color:var(--ink3);font-size:12px}
+.home-foot{
+  display:flex;justify-content:center;gap:20px;align-items:center;
+  margin-top:44px;padding-top:20px;border-top:1px solid var(--line2);
+  color:var(--ink3);font-size:12px;
+}
+.home-foot a{color:var(--ink2);cursor:pointer}
+
+/* ---------- 工作台 ---------- */
+.toolbar{
+  display:flex;align-items:center;gap:8px;padding:10px 14px;
+  border-bottom:1px solid var(--line);background:#FCFCFD;
+}
+.toolbar .sep{width:1px;height:20px;background:var(--line);margin:0 4px}
+.toolbar .spacer{flex:1}
+.toolbar .font-pick{
+  display:flex;align-items:center;gap:8px;padding:4px 10px;
+  border:1px solid var(--line);border-radius:var(--radius-s);font-size:13px;
+  background:#fff;cursor:pointer;
+}
+.toolbar .font-pick .dot{
+  width:7px;height:7px;border-radius:50%;background:var(--ok);
+}
+.work{display:flex;min-height:660px}
+.side{
+  width:380px;flex-shrink:0;border-right:1px solid var(--line);
+  background:var(--side);overflow-y:auto;padding-bottom:24px;
+}
+.grp{border-bottom:1px solid var(--line)}
+.grp-h{
+  display:flex;align-items:center;gap:8px;padding:12px 16px;cursor:pointer;
+  font-size:13px;font-weight:600;color:var(--ink);user-select:none;
+}
+.grp-h:hover{background:#EEF0F3}
+.grp-h .arw{
+  color:var(--ink3);font-size:10px;transition:.2s;display:inline-block;
+  transform:rotate(90deg);
+}
+.grp.collapsed .grp-h .arw{transform:rotate(0deg)}
+.grp.collapsed .grp-b{display:none}
+.grp-b{padding:0 16px 16px}
+.fld{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.fld label{width:92px;flex-shrink:0;font-size:13px;color:var(--ink2)}
+.fld .unit{font-size:12px;color:var(--ink3);width:24px;flex-shrink:0}
+.fld .input{width:0;flex:1}
+.fld2{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.fld2 label{width:92px;flex-shrink:0;font-size:13px;color:var(--ink2)}
+.col-checks{display:flex;flex-wrap:wrap;gap:6px}
+.chk{
+  display:inline-flex;align-items:center;gap:4px;font-size:12px;
+  padding:3px 8px;border:1px solid var(--line);border-radius:var(--radius-s);
+  background:#fff;cursor:pointer;user-select:none;
+}
+.chk.on{border-color:var(--primary);background:var(--primary-l);color:var(--primary)}
+.chk input{margin:0}
+.radio-row{display:flex;flex-direction:column;gap:8px}
+.radio{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+.presets{display:flex;gap:6px;margin-bottom:12px}
+.presets .p{
+  flex:1;height:30px;border:1px solid var(--line);background:#fff;border-radius:var(--radius-s);
+  font-family:inherit;font-size:13px;cursor:pointer;transition:.15s;color:var(--ink2);
+}
+.presets .p:hover{border-color:#C9CDD4}
+.presets .p.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+.slider-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.slider-row label{width:76px;flex-shrink:0;font-size:12.5px;color:var(--ink2)}
+.slider-row input[type=range]{
+  flex:1;-webkit-appearance:none;height:4px;border-radius:2px;
+  background:linear-gradient(90deg,var(--primary) 0%,var(--primary) 42%,#DCE0E6 42%,#DCE0E6 100%);
+  outline:none;
+}
+.slider-row input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+  background:#fff;border:2px solid var(--primary);cursor:pointer;
+  box-shadow:0 1px 3px rgba(0,0,0,.18);
+}
+.slider-row .val{width:52px;text-align:right;font-size:12px;color:var(--ink2);
+  font-family:Consolas,monospace;flex-shrink:0}
+.sub-h{font-size:12px;color:var(--ink3);margin:12px 0 8px;font-weight:600}
+.hint{
+  font-size:12px;color:var(--ink2);background:#fff;border:1px solid var(--line);
+  border-radius:var(--radius-s);padding:8px 10px;line-height:1.6;
+}
+.hint.warn{background:#FEFAF2;border-color:#F5DFB8;color:#8A6220}
+
+/* 预览区 */
+.canvas{
+  flex:1;display:flex;flex-direction:column;background:#EEF0F3;min-width:0;
+}
+.canvas-body{
+  flex:1;display:flex;align-items:flex-start;justify-content:center;padding:24px;
+  overflow:auto;
+}
+.paper-wrap{position:relative;filter:drop-shadow(0 4px 16px rgba(0,0,0,.13))}
+.paper{background:#fff;position:relative;overflow:hidden}
+.paper svg{display:block}
+.canvas-foot{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  padding:10px 16px;background:#FCFCFD;border-top:1px solid var(--line);
+  font-size:13px;color:var(--ink2);
+}
+.canvas-foot .pager{display:flex;align-items:center;gap:8px}
+.canvas-foot .pager b{color:var(--ink);font-weight:600}
+.canvas-foot label{display:flex;align-items:center;gap:5px;cursor:pointer}
+
+/* 步骤条 */
+.steps{
+  display:flex;align-items:center;justify-content:center;gap:0;
+  padding:16px;border-bottom:1px solid var(--line);background:#FCFCFD;
+}
+.step-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink3)}
+.step-item .n{
+  width:24px;height:24px;border-radius:50%;border:1.5px solid #D3D6DB;
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  background:#fff;color:var(--ink3);flex-shrink:0;
+}
+.step-item.on{color:var(--primary);font-weight:600}
+.step-item.on .n{background:var(--primary);border-color:var(--primary);color:#fff}
+.step-item.done .n{background:var(--ok);border-color:var(--ok);color:#fff}
+.step-item.done{color:var(--ink2)}
+.step-line{width:70px;height:1.5px;background:#E0E3E8;margin:0 12px}
+.step-line.done{background:var(--ok)}
+
+/* 采集步骤内容 */
+.wiz-body{padding:20px 24px;min-height:420px;background:#fff}
+.two-pane{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.pane{border:1px solid var(--line);border-radius:var(--radius-m);overflow:hidden}
+.pane-h{
+  padding:8px 12px;background:var(--side);border-bottom:1px solid var(--line);
+  font-size:12.5px;color:var(--ink2);display:flex;justify-content:space-between;
+}
+.pane-b{padding:14px;background:#FAFBFC;display:flex;align-items:center;justify-content:center;min-height:250px}
+.mock-photo{
+  width:100%;max-width:300px;background:#fff;border-radius:4px;
+  border:1px solid #E8EAEE;padding:14px 10px;
+  font-family:"KaiTi","STKaiti",serif;font-size:26px;color:#222;
+  line-height:1.85;letter-spacing:9px;text-align:center;
+  box-shadow:inset 0 0 30px rgba(0,0,0,.035);
+}
+.mock-photo .row{white-space:nowrap}
+.ctl-row{
+  display:flex;align-items:center;gap:14px;padding:12px 4px;
+  border-top:1px solid var(--line2);flex-wrap:wrap;
+}
+.ctl-row .lbl{font-size:13px;color:var(--ink2);flex-shrink:0}
+.tip{font-size:12px;color:var(--ink3);margin-left:auto}
+.wiz-foot{
+  display:flex;align-items:center;padding:14px 24px;border-top:1px solid var(--line);
+  background:#FCFCFD;
+}
+.wiz-foot .spacer{flex:1}
+/* 框字 */
+.boxed{position:relative;width:100%;max-width:620px;margin:0 auto}
+.box-canvas{
+  position:relative;background:#fff;border:1px solid #E8EAEE;border-radius:4px;
+  padding:24px 18px;font-family:"KaiTi","STKaiti",serif;font-size:30px;
+  line-height:2.1;letter-spacing:12px;text-align:center;color:#222;
+}
+.bbox{
+  position:absolute;border:1.5px solid var(--primary);
+  background:rgba(47,111,237,.09);border-radius:2px;cursor:pointer;
+}
+.bbox:hover{background:rgba(47,111,237,.18);border-width:2px}
+.bbox .lb{
+  position:absolute;top:-19px;left:-1px;font-size:11px;padding:0 5px;
+  background:#fff;border:1px solid var(--primary);border-radius:3px;
+  color:var(--primary);white-space:nowrap;font-family:inherit;
+}
+.bbox.del{border-color:var(--danger);background:rgba(217,74,74,.1)}
+.bbox.del .lb{border-color:var(--danger);color:var(--danger)}
+/* 标注 */
+.label-pane{position:relative}
+.lb-bubble{
+  position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);
+  font-size:12px;font-weight:600;padding:1px 7px;border-radius:4px;
+  font-family:inherit;white-space:nowrap;
+}
+.lb-bubble.green{background:#E8F6EF;color:var(--ok);border:1px solid #B7E2CD}
+.lb-bubble.orange{background:#FDF1DE;color:#B5761A;border:1px solid #F2D7A8}
+.keyboard{
+  margin-top:34px;border-top:1px solid var(--line2);padding-top:14px;
+}
+.kb-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.kb-row .kb-lbl{width:46px;font-size:12.5px;color:var(--ink2);flex-shrink:0}
+.key{
+  min-width:30px;height:30px;padding:0 8px;border:1px solid var(--line);
+  border-radius:var(--radius-s);background:#fff;font-family:inherit;font-size:13px;
+  cursor:pointer;transition:.12s;color:var(--ink);
+}
+.key:hover{border-color:#C9CDD4;background:#FAFBFC}
+.key.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+.key.miss{border-color:var(--warn);background:#FEFAF2;color:#B5761A}
+.progress-strip{
+  display:flex;align-items:center;gap:12px;padding:10px 14px;
+  background:var(--side);border-radius:var(--radius-s);margin-bottom:14px;
+  font-size:13px;
+}
+.progress-strip .bar{
+  flex:1;height:6px;background:#DCE0E6;border-radius:3px;overflow:hidden;
+}
+.progress-strip .bar i{
+  display:block;height:100%;width:64%;background:var(--primary);border-radius:3px;
+}
+/* 弹窗 */
+.modal-mask{
+  position:fixed;inset:0;background:rgba(20,24,32,.42);z-index:200;
+  display:none;align-items:center;justify-content:center;padding:24px;
+}
+.modal-mask.on{display:flex}
+.modal{
+  background:#fff;border-radius:var(--radius-m);width:100%;max-width:860px;
+  max-height:86vh;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 16px 48px rgba(0,0,0,.24);
+}
+.modal-h{
+  display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);
+}
+.modal-h h3{font-size:15px;font-weight:600}
+.modal-h .x{margin-left:auto;cursor:pointer;color:var(--ink3);font-size:18px;line-height:1}
+.modal-b{padding:16px 18px;overflow:auto;flex:1}
+.modal-f{
+  display:flex;align-items:center;gap:8px;padding:12px 18px;
+  border-top:1px solid var(--line);background:#FCFCFD;
+}
+.modal-f .spacer{flex:1}
+.grid-editor{border-collapse:collapse;font-size:13px}
+.grid-editor th,.grid-editor td{border:1px solid var(--line);padding:0}
+.grid-editor th{
+  background:var(--side);font-weight:500;color:var(--ink2);
+  font-size:12px;padding:6px 8px;white-space:nowrap;
+}
+.grid-editor td input{
+  width:74px;height:30px;border:none;padding:0 7px;font-family:inherit;
+  font-size:13px;outline:none;background:transparent;
+}
+.grid-editor td input:focus{background:var(--primary-l)}
+.grid-editor td.empty{background:#FEFAF2}
+.grid-editor td.empty input::placeholder{color:#C08A2A}
+.grid-editor td.rownum{background:var(--side);text-align:center;color:var(--ink3);
+  font-size:12px;padding:0 8px;width:46px}
+/* 帮助浮标 */
+.note{
+  max-width:1420px;margin:0 auto 16px;padding:12px 16px;border-radius:var(--radius-s);
+  background:#FFF8E8;border:1px solid #F3E0B5;color:#7A5A15;font-size:13px;line-height:1.7;
+}
+.note b{color:#5C430C}
+.note code{background:#fff;padding:1px 5px;border-radius:3px;font-size:12px;
+  border:1px solid #EBD9AE;font-family:Consolas,monospace}
+</style>
+</head>
+<body>
+
+<div class="proto-bar">
+  <div class="brand">手写字迹填充器 <small>界面原型 v1.0 · 静态演示</small></div>
+  <div class="proto-tabs">
+    <button data-s="s1" class="on">① 首页</button>
+    <button data-s="s2">② 主工作台</button>
+    <button data-s="s3">③ 字形采集向导</button>
+    <button data-s="s4">④ 手动录入弹窗</button>
+  </div>
+</div>
+
+<div class="stage">
+
+<!-- ======================= 屏1 首页 ======================= -->
+<div class="screen on" id="s1">
+  <div class="screen-title">
+    <h2>屏 1 · 首页</h2>
+    <p>三张卡片引导用户走三条路。首次使用时「新建字形库」视觉最突出；已有字形库则卡片②高亮。</p>
+  </div>
+  <div class="win home">
+    <div class="home-hero">
+      <h1>手 写 字 迹 填 充 器</h1>
+      <p>把表格变成你自己的字迹</p>
+    </div>
+    <div class="home-cards">
+
+      <div class="card hero-card">
+        <div class="step">1</div>
+        <h3>新建字形库</h3>
+        <div class="desc">拍几张自己写的字，做成你的专属字形。全程只需三部：抠图 → 框字 → 标注。</div>
+        <div class="actions">
+          <button class="btn primary lg">开始采集</button>
+          <span class="tag">约 10 分钟</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step" style="background:#E8F6EF;color:var(--ok)">2</div>
+        <h3>我的字形库</h3>
+        <div class="desc">选择一套已采集好的字迹，开始填表。</div>
+        <div class="font-mini">
+          <div class="thumb">3 6 3<br>8 1 4</div>          <div class="meta">
+            <b>我的字迹</b><br>
+            已采集 12/12 · 2026-10-09
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn primary">选择并使用</button>
+          <button class="btn ghost">管理</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step">3</div>
+        <h3>打开项目</h3>
+        <div class="desc">继续上次没做完的表格填写。</div>
+        <div class="recent-list">
+          <div class="row"><span>六年级3班晨午检表</span><span>10-09 15:20</span></div>
+          <div class="row"><span>五年级2班点名册</span><span>10-08 09:02</span></div>
+          <div class="row"><span>门卫登记表</span><span>10-03 16:41</span></div>
+        </div>
+        <div class="actions">
+          <button class="btn" style="width:100%">打开 .hwpj 文件</button>
+        </div>
+      </div>
+
+    </div>
+    <div class="home-foot">
+      <a>帮助</a><a>关于</a><span>v1.0</span>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= 屏2 主工作台 ======================= -->
+<div class="screen" id="s2">
+  <div class="screen-title">
+    <h2>屏 2 · 主工作台</h2>
+    <p>左侧参数面板可折叠分组，右侧预览直接叠加网格线，改参数即时可见。</p>
+  </div>
+  <div class="win">
+    <div class="toolbar">
+      <button class="btn primary">＋ 新建</button>
+      <button class="btn">打开</button>
+      <button class="btn">保存</button>
+      <div class="sep"></div>
+      <button class="btn primary">导出 PDF</button>
+      <div class="spacer"></div>
+      <div class="font-pick"><span class="dot"></span> 字形库：我的字迹 <span style="color:#8F959E;font-size:10px">▾</span></div>
+      <button class="btn ghost">?</button>
+    </div>
+
+    <div class="work">
+      <!-- 侧栏 -->
+      <div class="side">
+
+        <div class="grp">
+          <div class="grp-h"><span class="arw">▶</span> 网格标定</div>
+          <div class="grp-b">
+            <div class="fld"><label>起点 X</label><input class="input" value="12.5"><span class="unit">mm</span></div>
+            <div class="fld"><label>起点 Y</label><input class="input" value="45.0"><span class="unit">mm</span></div>
+            <div class="fld"><label>列宽</label><input class="input" value="15.0"><span class="unit">mm</span></div>
+            <div class="fld"><label>行高</label><input class="input" value="12.0"><span class="unit">mm</span></div>
+            <div class="fld"><label>内边距</label><input class="input" value="1.0"><span class="unit">mm</span></div>
+            <div class="hint" style="margin-top:12px">
+              提示：在右边预览图上直接拖动网格，这里数字会跟着变。
+            </div>
+          </div>
+        </div>
+
+        <div class="grp">
+          <div class="grp-h"><span class="arw">▶</span> 行列数</div>
+          <div class="grp-b">
+            <div class="fld"><label>行数</label><input class="input" value="24"><span class="unit"></span></div>
+            <div class="fld"><label>列数</label><input class="input" value="10"><span class="unit"></span></div>
+          </div>
+        </div>
+
+        <div class="grp">
+          <div class="grp-h"><span class="arw">▶</span> 参与填充的列</div>
+          <div class="grp-b">
+            <div class="col-checks">
+              <span class="chk on">1</span><span class="chk on">2</span><span class="chk on">3</span>
+              <span class="chk on">4</span><span class="chk on">5</span><span class="chk on">6</span>
+              <span class="chk on">7</span><span class="chk on">8</span><span class="chk on">9</span>
+              <span class="chk on">10</span>
+            </div>
+            <div class="hint" style="margin-top:10px">取消勾选的列会留空，比如表格里不需要填的栏目。</div>
+          </div>
+        </div>
+
+        <div class="grp">
+          <div class="grp-h"><span class="arw">▶</span> 填写内容</div>
+          <div class="grp-b">
+            <div class="fld2">
+              <label style="width:0"></label>
+              <div class="radio-row" style="flex:1">
+                <label class="radio"><input type="radio" name="cmode" checked> 随机数字 / 小数</label>
+                <label class="radio"><input type="radio" name="cmode"> 指定区间（如 36.0 ~ 37.5）</label>
+                <label class="radio"><input type="radio" name="cmode"> 手动录入</label>
+              </div>
+            </div>
+            <div class="fld" style="margin-top:12px"><label>最小值</label><input class="input" value="36.0"><span class="unit"></span></div>
+            <div class="fld"><label>最大值</label><input class="input" value="37.5"><span class="unit"></span></div>
+            <div class="fld"><label>小数位数</label><input class="input" value="1"><span class="unit"></span></div>
+            <div class="fld"><label>每格字数</label><input class="input" value="2 ~ 4"><span class="unit"></span></div>
+          </div>
+        </div>
+
+        <div class="grp">
+          <div class="grp-h"><span class="arw">▶</span> 抖动参数</div>
+          <div class="grp-b">
+            <div class="presets">
+              <button class="p">轻微</button>
+              <button class="p on">自然</button>
+              <button class="p">明显</button>
+            </div>
+
+            <div class="sub-h">一、单元整体随机</div>
+            <div class="slider-row"><label>左右偏移</label><input type="range" min="0" max="50" value="8"><span class="val">8%</span></div>
+            <div class="slider-row"><label>上下偏移</label><input type="range" min="0" max="50" value="8"><span class="val">8%</span></div>
+            <div class="slider-row"><label>整体旋转</label><input type="range" min="0" max="15" value="3"><span class="val">±3°</span></div>
+
+            <div class="sub-h">二、单字位置随机</div>
+            <div class="slider-row"><label>左右</label><input type="range" min="0" max="100" value="10"><span class="val">10%</span></div>
+            <div class="slider-row"><label>上下</label><input type="range" min="0" max="100" value="10"><span class="val">10%</span></div>
+            <div class="slider-row"><label>字间距</label><input type="range" min="0" max="50" value="8"><span class="val">8%</span></div>
+
+            <div class="sub-h">三、单字形变随机</div>
+            <div class="slider-row"><label>字体大小</label><input type="range" min="60" max="140" value="107"><span class="val">85~115%</span></div>
+            <div class="slider-row"><label>字体加粗</label><input type="range" min="0" max="3" value="1"><span class="val">1px</span></div>
+            <div class="slider-row"><label>字体倾度</label><input type="range" min="0" max="20" value="6"><span class="val">±6°</span></div>
+            <div class="slider-row"><label>水平拉伸</label><input type="range" min="70" max="130" value="100"><span class="val">92~108%</span></div>
+            <div class="slider-row"><label>垂直拉伸</label><input type="range" min="70" max="130" value="100"><span class="val">92~108%</span></div>
+
+            <div class="sub-h">四、小数点随机</div>
+            <div class="slider-row"><label>位置</label><input type="range" min="0" max="30" value="10"><span class="val">10%</span></div>
+            <div class="slider-row"><label>大小</label><input type="range" min="50" max="120" value="95"><span class="val">80~110%</span></div>
+
+            <div class="fld" style="margin-top:14px">
+              <label>随机种子</label><input class="input" placeholder="留空 = 每次不同">
+            </div>
+            <div style="margin-top:6px"><button class="btn ghost" style="font-size:12px">重置为默认</button></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 预览 -->
+      <div class="canvas">
+        <div class="canvas-body">
+          <div class="paper-wrap">
+            <div class="paper" style="width:520px;height:735px">
+              <svg width="520" height="735" viewBox="0 0 520 735">
+                <!-- 表头（模拟模板原内容） -->
+                <text x="260" y="46" text-anchor="middle" font-family="SimSun,serif"
+                      font-size="19" font-weight="bold" fill="#111">六年级3班晨午检记录表</text>
+                <text x="260" y="70" text-anchor="middle" font-family="SimSun,serif"
+                      font-size="13" fill="#333">2026年10月9日</text>
+                <!-- 表格线 -->
+                <g stroke="#333" stroke-width="1">
+                  <line x1="34" y1="96" x2="486" y2="96"/>
+                  <line x1="34" y1="126" x2="486" y2="126"/>
+                  <line x1="34" y1="726" x2="486" y2="726"/>
+                  <line x1="34" y1="96" x2="34" y2="726"/>
+                  <line x1="486" y1="96" x2="486" y2="726"/>
+                  <!-- 第1列 + 后续列 -->
+                  <line x1="66" y1="96" x2="66" y2="726"/>
+                  <line x1="150" y1="96" x2="150" y2="726"/>
+                  <line x1="196" y1="96" x2="196" y2="726"/>
+                  <line x1="242" y1="96" x2="242" y2="726"/>
+                  <line x1="288" y1="96" x2="288" y2="726"/>
+                  <line x1="334" y1="96" x2="334" y2="726"/>
+                  <line x1="380" y1="96" x2="380" y2="726"/>
+                  <line x1="426" y1="96" x2="426" y2="726"/>
+                  <!-- 行线：25行 -->
+                  <g id="rowlines"></g>
+                </g>
+                <!-- 网格叠加（半透明蓝，示意"显示网格"开启） -->
+                <g id="gridoverlay"></g>
+                <!-- 手写填充内容 -->
+                <g id="fillcontent" font-family="KaiTi,STKaiti,serif" fill="#111"></g>
+                <!-- 表头文字 -->
+                <g font-family="SimSun,serif" font-size="11.5" fill="#222" text-anchor="middle">
+                  <text x="50" y="115">序号</text>
+                  <text x="108" y="115">姓名</text>
+                  <text x="173" y="115">晨检</text>
+                  <text x="219" y="115">午检</text>
+                  <text x="265" y="115">体温</text>
+                  <text x="311" y="115">症状</text>
+                  <text x="357" y="115">处理</text>
+                  <text x="403" y="115">备注</text>
+                  <text x="456" y="115">签名</text>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="canvas-foot">
+          <div class="pager">
+            <button class="btn" style="height:28px;padding:0 10px">◀ 上一页</button>
+            <span>第 <b>1</b> / 2 页</span>
+            <button class="btn" style="height:28px;padding:0 10px">下一页 ▶</button>
+          </div>
+          <label><input type="checkbox" checked> 应用到所有页</label>
+          <label><input type="checkbox" checked> 显示网格</label>
+          <button class="btn ghost" style="height:28px">按住查看原图</button>
+          <span style="margin-left:auto;color:var(--ink3);font-size:12px">缩放 100%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= 屏3 字形采集向导 ======================= -->
+<div class="screen" id="s3">
+  <div class="screen-title">
+    <h2>屏 3 · 字形采集向导（三步）</h2>
+    <p>点下面的「① ② ③」切换三步。设计要点：每步都能返回、实时预览、缺字只警告不报错。</p>
+  </div>
+  <div class="win">
+    <div class="toolbar">
+      <button class="btn ghost">← 返回首页</button>
+      <div class="spacer"></div>
+      <span style="font-size:13px;color:var(--ink2)">新建字形库 · 我的字迹</span>
+    </div>
+
+    <div class="steps" id="stepbar">
+      <div class="step-item on" data-w="w1"><span class="n">1</span> 抠图</div>
+      <div class="step-line"></div>
+      <div class="step-item" data-w="w2"><span class="n">2</span> 框字</div>
+      <div class="step-line"></div>
+      <div class="step-item" data-w="w3"><span class="n">3</span> 标注</div>
+    </div>
+
+    <!-- 第一步 -->
+    <div class="wiz-body" id="w1">
+      <div class="two-pane">
+        <div class="pane">
+          <div class="pane-h"><span>原图</span><span>1920 × 2560</span></div>
+          <div class="pane-b">
+            <div class="mock-photo">
+              <div class="row">0 1 2 3 4</div>
+              <div class="row">5 6 7 8 9</div>
+              <div class="row">, .</div>
+            </div>
+          </div>
+        </div>
+        <div class="pane">
+          <div class="pane-h"><span>处理后预览（黑白）</span><span>已去背景</span></div>
+          <div class="pane-b">
+            <div class="mock-photo" style="color:#000;background:#fff;filter:contrast(1.9) grayscale(1)">
+              <div class="row">0 1 2 3 4</div>
+              <div class="row">5 6 7 8 9</div>
+              <div class="row">, .</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ctl-row">
+        <span class="lbl">容差</span>
+        <input type="range" min="0" max="100" value="29" style="width:280px">
+        <span class="mono" style="font-size:13px;color:var(--ink)">29</span>
+        <span class="tip">容差越高，保留的近似黑色像素越多（字更粗）</span>
+      </div>
+      <div class="ctl-row">
+        <label class="radio"><input type="checkbox"> 反色（白笔写在黑纸上）</label>
+        <span class="lbl" style="margin-left:20px">旋转校正</span>
+        <input type="range" min="-15" max="15" value="0" style="width:150px">
+        <span class="mono" style="font-size:13px">0°</span>
+        <button class="btn ghost" style="margin-left:auto">重新选择图片</button>
+      </div>
+    </div>
+
+    <!-- 第二步：用 SVG 画，字形与选框在同一坐标系，保证精确对齐 -->
+    <div class="wiz-body" id="w2" style="display:none">
+      <div style="display:flex;justify-content:center">
+        <svg id="svgbox2" width="640" height="300" viewBox="0 0 640 300"></svg>
+      </div>
+      <div class="hint" style="margin-top:18px">
+        已框选 <b>12</b> 个字符。如果有框错了或者漏了，可以 <b>右键删除</b>，或者在空白处 <b>拖拽补一个框</b>。
+        快捷键：Ctrl+Z 撤销、Ctrl+Y 恢复、Delete 删除选中框。
+      </div>
+      <div class="wiz-foot" style="margin:18px -24px -20px;border-radius:0">
+        <button class="btn">上一步</button>
+        <div class="spacer"></div>
+        <button class="btn">撤销</button>
+        <button class="btn">恢复</button>
+        <button class="btn primary lg">下一步 ▶</button>
+      </div>
+    </div>
+
+    <!-- 第三步 -->
+    <div class="wiz-body" id="w3" style="display:none">
+      <div class="progress-strip">
+        <span>已采集 <b>10 / 12</b></span>
+        <div class="bar"><i style="width:83%"></i></div>
+        <span class="tag warn">⚠ 还缺少：<b>,</b> <b>.</b></span>
+        <span style="margin-left:auto;font-size:12.5px;color:var(--ink2)">字号预览　<a style="cursor:pointer">小</a> · <a style="cursor:pointer"><b>中</b></a> · <a style="cursor:pointer">大</a></span>
+      </div>
+
+      <div style="display:flex;justify-content:center">
+        <svg id="svglabel3" width="640" height="330" viewBox="0 0 640 330"></svg>
+      </div>
+
+      <div class="keyboard">
+        <div class="kb-row">
+          <span class="kb-lbl">数字</span>
+          <button class="key">0</button><button class="key">1</button><button class="key">2</button>
+          <button class="key on">3</button><button class="key">4</button><button class="key">5</button>
+          <button class="key">6</button><button class="key">7</button><button class="key">8</button>
+          <button class="key">9</button>
+          <span style="width:18px"></span>
+          <span class="kb-lbl" style="width:auto;margin-right:2px">标点</span>
+          <button class="key miss">,</button><button class="key miss">.</button>
+        </div>
+        <div class="hint" style="margin-top:12px">
+          点击下方字符 → 进入标注模式 → 依次点框可批量标注 → <b>再次点击同一个字符退出标注模式</b>。<br>
+          橙色高亮 = 这个字符还没有采集到样本。可以「稍后补充」，不耽误导出。<br>
+          <span style="color:var(--ink3)">v1 只采集这 12 个字符（数字 + 逗号 + 句点），不含字母和汉字。</span>
+        </div>
+        </div>
+      </div>
+
+      <div class="wiz-foot" style="margin:18px -24px -20px">
+        <button class="btn">上一步</button>
+        <div class="spacer"></div>
+        <button class="btn">稍后补充</button>
+        <button class="btn primary lg">导出字形库</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= 屏4 弹窗 ======================= -->
+<div class="screen" id="s4">
+  <div class="screen-title">
+    <h2>屏 4 · 手动录入弹窗</h2>
+    <p>支持从 Excel / WPS 直接 Ctrl+V 粘贴；没有字形的字符会黄底提示「将跳过」。</p>
+  </div>
+  <div class="win" style="padding:20px;background:#F5F6F8">
+    <div class="modal" style="max-width:none;max-height:none;box-shadow:0 8px 30px rgba(0,0,0,.14)">
+      <div class="modal-h">
+        <h3>手动录入内容</h3>
+        <span style="margin-left:12px;font-size:12px;color:var(--ink3)">共 24 行 × 10 列　·　黄底表示该字符没有字形，将被跳过</span>
+        <span class="x">×</span>
+      </div>
+      <div class="modal-b" style="max-height:520px">
+        <table class="grid-editor">
+          <thead>
+            <tr>
+              <th></th>
+              <th>第1列</th><th>第2列</th><th>第3列</th><th>第4列</th><th>第5列</th>
+              <th>第6列</th><th>第7列</th><th>第8列</th><th>第9列</th><th>第10列</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="rownum">第1行</td>
+              <td><input value="1"></td>
+              <td class="empty"><input value="张三" placeholder="将跳过"></td>
+              <td><input value="36.5"></td><td><input value="36.4"></td><td><input value="36.6"></td>
+              <td><input value="36.5"></td><td><input value="36.4"></td><td><input value="36.6"></td>
+              <td><input value="36.5"></td><td><input value="36.4"></td></tr>
+            <tr><td class="rownum">第2行</td>
+              <td><input value="2"></td>
+              <td class="empty"><input value="李四" placeholder="将跳过"></td>
+              <td><input value="36.6"></td><td><input value="36.5"></td><td><input value="36.4"></td>
+              <td><input value="36.6"></td><td><input value="36.5"></td><td><input value="36.4"></td>
+              <td><input value="36.6"></td><td><input value="36.5"></td></tr>
+            <tr><td class="rownum">第3行</td>
+              <td><input value="3"></td>
+              <td class="empty"><input value="王五" placeholder="将跳过"></td>
+              <td><input value="36.4"></td><td><input value="36.6"></td><td><input value="36.5"></td>
+              <td><input value="36.4"></td><td><input value="36.6"></td><td><input value="36.5"></td>
+              <td><input value="36.4"></td><td><input value="36.6"></td></tr>
+            <tr><td class="rownum">第4行</td>
+              <td><input value="4"></td>
+              <td class="empty"><input value="赵六" placeholder="将跳过"></td>
+              <td><input value="36.5"></td><td><input value="36.5"></td><td><input value="36.7"></td>
+              <td><input value="36.5"></td><td><input value="36.5"></td><td><input value="36.7"></td>
+              <td><input value="36.5"></td><td><input value="36.5"></td></tr>
+            <tr><td class="rownum">第5行</td>
+              <td><input value="5"></td>
+              <td class="empty"><input value="孙七" placeholder="将跳过"></td>
+              <td><input value="36.3"></td><td><input value="36.4"></td><td><input value="36.5"></td>
+              <td><input value="36.3"></td><td><input value="36.4"></td><td><input value="36.5"></td>
+              <td><input value="36.3"></td><td><input value="36.4"></td></tr>
+            <tr><td class="rownum">第6行</td>
+              <td><input value="6"></td><td><input value=""></td>
+              <td><input value=""></td><td><input value=""></td><td><input value=""></td>
+              <td><input value=""></td><td><input value=""></td><td><input value=""></td>
+              <td><input value=""></td><td><input value=""></td></tr>
+            <tr><td class="rownum">第7行</td>
+              <td><input value="7"></td><td><input value=""></td>
+              <td><input value=""></td><td><input value=""></td><td><input value=""></td>
+              <td><input value=""></td><td><input value=""></td><td><input value=""></td>
+              <td><input value=""></td><td><input value=""></td></tr>
+            <tr><td class="rownum" colspan="11" style="color:var(--ink3);font-size:12px;padding:8px">
+              ⋯ 以下 17 行为空（可以直接从 Excel 复制 24×10 区域，按 Ctrl+V 粘贴进来）
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-f">
+        <button class="btn">从表格粘贴</button>
+        <button class="btn danger">清空</button>
+        <div class="spacer"></div>
+        <button class="btn">取消</button>
+        <button class="btn primary">保存更改</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /stage -->
+
+<script>
+/* 页签切换（支持 URL hash：#s1 ~ #s4，可直接分享某一屏） */
+function showScreen(sid){
+  document.querySelectorAll('.proto-tabs button').forEach(x=>{
+    x.classList.toggle('on', x.dataset.s===sid);
+  });
+  document.querySelectorAll('.screen').forEach(x=>{
+    x.classList.toggle('on', x.id===sid);
+  });
+}
+document.querySelectorAll('.proto-tabs button').forEach(b=>{
+  b.onclick=()=>{
+    showScreen(b.dataset.s);
+    history.replaceState(null,'','#'+b.dataset.s);
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+});
+/* hash 初始化在脚本最末尾执行，确保向导步骤的点击处理器已绑定 */
+window.addEventListener('hashchange',()=>{
+  const h=location.hash.replace('#','');
+  if(h && document.getElementById(h)) showScreen(h);
+});
+
+/* 工作台：分组折叠 */
+document.querySelectorAll('.grp-h').forEach(h=>{
+  h.onclick=()=>{
+    const g=h.parentElement;
+    if(h.textContent.includes('抖动')||h.textContent.includes('网格')||h.textContent.includes('内容')){
+      g.classList.toggle('collapsed');
+    }
+  };
+});
+
+/* 工作台：列勾选 */
+document.querySelectorAll('.chk').forEach(c=>{
+  c.onclick=()=>c.classList.toggle('on');
+});
+
+/* 工作台：抖动预设 */
+document.querySelectorAll('.presets .p').forEach(p=>{
+  p.onclick=()=>{
+    document.querySelectorAll('.presets .p').forEach(x=>x.classList.remove('on'));
+    p.classList.add('on');
+    redraw();
+  };
+});
+
+/* 滑块数值联动 */
+document.querySelectorAll('.slider-row').forEach(row=>{
+  const r=row.querySelector('input[type=range]'), v=row.querySelector('.val');
+  if(!r||!v) return;
+  const upd=()=>{
+    const pct=(r.value-r.min)/(r.max-r.min)*100;
+    r.style.background=`linear-gradient(90deg,var(--primary) 0%,var(--primary) ${pct}%,#DCE0E6 ${pct}%,#DCE0E6 100%)`;
+  };
+  r.oninput=()=>{ upd(); if(row.parentElement.parentElement.textContent.includes('抖动')) redraw(); };
+  upd();
+});
+
+/* ---- 预览区：把表格与手写内容画出来（纯原创的随机抖动模拟） ---- */
+const COLS=[66,150,196,242,288,334,380,426,486];   // 列边界
+const ROW_TOP=126, ROW_BOT=726, ROWS=24;
+const rowH=(ROW_BOT-ROW_TOP)/ROWS;
+
+function buildTable(){
+  const g=document.getElementById('rowlines');
+  let s='';
+  for(let i=1;i<ROWS;i++){
+    const y=ROW_TOP+i*rowH;
+    s+=`<line x1="34" y1="${y.toFixed(1)}" x2="486" y2="${y.toFixed(1)}" stroke-width="0.7"/>`;
+  }
+  g.innerHTML=s;
+}
+
+/* 网格叠加：把参与填充的列画成淡蓝色块 */
+function buildOverlay(){
+  const g=document.getElementById('gridoverlay');
+  let s='';
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS.length-1;c++){
+      const x=COLS[c], w=COLS[c+1]-COLS[c];
+      const y=ROW_TOP+r*rowH, h=rowH;
+      s+=`<rect x="${x}" y="${y.toFixed(1)}" width="${w}" height="${h.toFixed(1)}"
+            fill="#2F6FED" fill-opacity="0.035" stroke="#2F6FED" stroke-opacity="0.16" stroke-width="0.5"/>`;
+    }
+  }
+  g.innerHTML=s;
+}
+
+/* 确定性伪随机（同一 seed 结果稳定，模仿"随机种子"特性） */
+function rnd(seed){
+  let x=Math.sin(seed*127.1+311.7)*43758.5453;
+  return x-Math.floor(x);
+}
+
+let FILL_SEED=20261009;
+
+function buildContent(){
+  const g=document.getElementById('fillcontent');
+  let s='';
+  const names=['张','李','王','赵','孙','周','吴','郑','冯','陈','褚','卫','蒋','沈','韩','杨','朱','秦','尤','许','何','吕','施','张'];
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS.length-1;c++){
+      const x=COLS[c], w=COLS[c+1]-COLS[c];
+      const y=ROW_TOP+r*rowH, h=rowH;
+      const sd=FILL_SEED + r*1000 + c;
+      let txt='';
+      if(c===0){ txt=String(r+1); }
+      else if(c===1){ txt = names[r] + (rnd(sd+7)>0.5?'小明':'小红'); }
+      else { txt = (36+rnd(sd)*1.6).toFixed(1); }
+
+      /* 单元整体随机：整格偏移 + 旋转（幅度克制，避免文字跑出格子） */
+      const cellDX=(rnd(sd+1)-0.5)*w*0.07;
+      const cellDY=(rnd(sd+2)-0.5)*h*0.07;
+      const cellR=(rnd(sd+3)-0.5)*4;
+
+      const cx=x+w/2+cellDX, cy=y+h/2+cellDY;
+      /* 字号按可用宽高双约束，并留出 12% 余量给抖动 */
+      const fs=Math.min(h*0.60, (w*0.90)/Math.max(txt.length,1));
+      const rot=cellR+(rnd(sd+4)-0.5)*5;
+      const scale=0.85+rnd(sd+5)*0.3;
+
+      s+=`<text x="${cx.toFixed(1)}" y="${cy.toFixed(1)}"
+             text-anchor="middle" dominant-baseline="central"
+             font-size="${fs.toFixed(1)}"
+             transform="rotate(${rot.toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)})"
+             fill="#1a1a1a" opacity="0.93">${txt}</text>`;
+    }
+  }
+  g.innerHTML=s;
+}
+
+function redraw(){
+  FILL_SEED = Math.floor(Math.random()*1e7);   // 模拟"重新抖动"的观感
+  buildContent();
+}
+
+/* ---- 采集向导第 2 步：框字（SVG，字形与框同坐标系） ---- */
+function drawBoxStep(){
+  const svg=document.getElementById('svgbox2');
+  if(!svg) return;
+  const W=640,H=300, cols=5, rows=3;
+  const cellW=100, cellH=76, ox=(W-cols*cellW)/2, oy=(H-rows*cellH)/2;
+  /* v1 字符集：0-9 + , . —— 恰好 12 个，第三行只有 2 个真字符，其余留空 */
+  const chars=[['0','1','2','3','4'],['5','6','7','8','9'],[',','.','','','']];
+  let s='';
+  /* 纸张背景 */
+  s+=`<rect x="${ox-30}" y="${oy-26}" width="${cols*cellW+60}" height="${rows*cellH+52}"
+        fill="#fff" stroke="#E8EAEE" rx="4"/>`;
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const gx=ox+c*cellW, gy=oy+r*cellH, gw=cellW, gh=cellH;
+      if(!chars[r][c]) continue;   /* 空格子不画 */
+      /* 手写字形 */
+      s+=`<text x="${gx+gw/2}" y="${gy+gh/2}" text-anchor="middle" dominant-baseline="central"
+             font-family="KaiTi,STKaiti,serif" font-size="40" fill="#1a1a1a">${chars[r][c]}</text>`;
+      /* 框选（第 2 行第 5 个故意做成"框错了"） */
+      const isBad=(r===1 && c===4);
+      const bc=isBad? '#D94A4A' : '#2F6FED';
+      const bf=isBad? 'rgba(217,74,74,.10)' : 'rgba(47,111,237,.09)';
+      s+=`<rect x="${gx+8}" y="${gy+4}" width="${gw-16}" height="${gh-10}"
+             fill="${bf}" stroke="${bc}" stroke-width="1.5" rx="2"
+             style="cursor:pointer"/>`;
+      /* 标签 */
+      const lt=isBad? '框错了 · 右键删除' : '待标注';
+      const lw=lt.length*8.5+12;
+      s+=`<rect x="${gx+8}" y="${gy-15}" width="${lw}" height="17" fill="#fff" stroke="${bc}" rx="3"/>`;
+      s+=`<text x="${gx+8+lw/2}" y="${gy-3}" text-anchor="middle"
+             font-size="11" fill="${bc}" font-family="inherit">${lt}</text>`;
+    }
+  }
+  svg.innerHTML=s;
+}
+
+/* ---- 采集向导第 3 步：标注（SVG，框 + 标签气泡同坐标系） ---- */
+function drawLabelStep(){
+  const svg=document.getElementById('svglabel3');
+  if(!svg) return;
+  const W=640,H=330, cols=5, rows=3;
+  const cellW=100, cellH=84, ox=(W-cols*cellW)/2, oy=(H-rows*cellH)/2;
+  /* v1 字符集同上：0-9 + , . —— 第 2 行第 3 个故意留 "?" 演示"未识别待确认" */
+  const chars =[['0','1','2','3','4'],['5','6','7','8','9'],[',','.','','','']];
+  const labels=[['0','1','?','3','4'],['5','6','7','8','9'],[',','.','','','']];
+  let s='';
+  s+=`<rect x="${ox-30}" y="${oy-26}" width="${cols*cellW+60}" height="${rows*cellH+52}"
+        fill="#fff" stroke="#E8EAEE" rx="4"/>`;
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const gx=ox+c*cellW, gy=oy+r*cellH, gw=cellW, gh=cellH;
+      if(!chars[r][c]) continue;   /* 空格子不画 */
+      s+=`<text x="${gx+gw/2}" y="${gy+gh/2-8}" text-anchor="middle" dominant-baseline="central"
+             font-family="KaiTi,STKaiti,serif" font-size="40" fill="#1a1a1a">${chars[r][c]}</text>`;
+      const unk=(labels[r][c]==='?');
+      /* 选框 */
+      s+=`<rect x="${gx+8}" y="${gy+4}" width="${gw-16}" height="${gh-26}"
+             fill="rgba(47,111,237,.06)" stroke="#2F6FED" stroke-width="1.2" rx="2"/>`;
+      /* 标签气泡 */
+      const bw=24, bx=gx+gw/2-bw/2, by=gy+gh-22;
+      const bg=unk? '#FDF1DE' : '#E8F6EF';
+      const bc=unk? '#B5761A' : '#22A06B';
+      const bd=unk? '#F2D7A8' : '#B7E2CD';
+      s+=`<rect x="${bx}" y="${by}" width="${bw}" height="18" rx="4" fill="${bg}" stroke="${bd}"/>`;
+      s+=`<text x="${bx+bw/2}" y="${by+13}" text-anchor="middle" font-size="12"
+             font-weight="600" fill="${bc}" font-family="inherit">${labels[r][c]}</text>`;
+    }
+  }
+  svg.innerHTML=s;
+}
+
+buildTable(); buildOverlay(); buildContent();
+drawBoxStep(); drawLabelStep();
+
+/* 采集向导：步骤切换 */
+document.querySelectorAll('#stepbar .step-item').forEach(it=>{
+  it.onclick=()=>{
+    const id=it.dataset.w;
+    ['w1','w2','w3'].forEach(w=>{
+      document.getElementById(w).style.display = (w===id)?'block':'none';
+    });
+    const order=['w1','w2','w3'];
+    const idx=order.indexOf(id);
+    document.querySelectorAll('#stepbar .step-item').forEach((x,i)=>{
+      x.classList.remove('on','done');
+      if(i===idx) x.classList.add('on');
+      else if(i<idx) x.classList.add('done');
+    });
+    document.querySelectorAll('#stepbar .step-line').forEach((l,i)=>{
+      l.classList.toggle('done', i<idx);
+    });
+  };
+});
+
+/* ---- 初始化：读 URL hash（放最后，确保所有处理器已绑定） ----
+   #s1 #s2 #s3 #s4      直接打开某一屏
+   #s3/w2  #s3/w3       打开采集向导并停在指定步骤         */
+(function(){
+  const raw=(location.hash||'').replace('#','');
+  if(!raw) return;
+  const parts=raw.split('/');
+  const sid=parts[0], sub=parts[1];
+  if(!document.getElementById(sid)) return;
+  showScreen(sid);
+  if(sub){
+    const it=document.querySelector('#stepbar .step-item[data-w='+sub+']');
+    if(it) it.click();
+  }
+})();
+window.addEventListener('hashchange',()=>{
+  const raw=(location.hash||'').replace('#','');
+  const parts=raw.split('/');
+  if(!document.getElementById(parts[0])) return;
+  showScreen(parts[0]);
+  if(parts[1]){
+    const it=document.querySelector('#stepbar .step-item[data-w='+parts[1]+']');
+    if(it) it.click();
+  }
+});
+</script>
+</body>
+</html>

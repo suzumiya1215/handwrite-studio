@@ -1,0 +1,41 @@
+[project]
+name = "handwrite-studio"
+version = "1.0.0"
+description = "手写字迹填充器 —— 用你自己的手写笔迹自动填表"
+requires-python = ">=3.11"
+dependencies = [
+    "PySide6>=6.6",
+    "opencv-python-headless>=4.9",
+    "Pillow>=10.0",
+    "PyMuPDF>=1.24",
+    "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+build = ["pyinstaller>=6.0"]
+
+[project.gui-scripts]
+handwrite-studio = "handwrite.main:main"
+
+[project.urls]
+Homepage = "https://example.invalid/handwrite-studio"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# ★ 资源随包走 —— style.qss / icons 要能被打进 exe（实施计划 P4 铁律）
+[tool.setuptools.package-data]
+handwrite = ["resources/*.qss", "resources/icons/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q --tb=short"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]

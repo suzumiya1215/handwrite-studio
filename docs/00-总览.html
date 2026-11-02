@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>手写字迹填充器 · 项目总览</title>
+<style>
+:root{
+  --primary:#2F6FED; --primary-l:#EAF1FE; --primary-d:#1F55C9;
+  --ok:#22A06B; --ok-l:#E8F6EF;
+  --warn:#E8A33D; --warn-l:#FCF3E4;
+  --danger:#D94A4A; --danger-l:#FDF0F0;
+  --purple:#7B5FE8; --purple-l:#F0EDFE;
+  --ink:#1F2329; --ink2:#5A6270; --ink3:#8F959E;
+  --bg:#FFFFFF; --side:#F6F7F9; --line:#E4E6EB; --line2:#EDEFF2;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Microsoft YaHei","PingFang SC",sans-serif; font-size:15px;
+  color:var(--ink); background:#F2F4F7; line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;background:#fff;min-height:100vh;
+  box-shadow:0 0 60px rgba(0,0,0,.07)}
+
+/* 封面 */
+.cover{
+  background:linear-gradient(135deg,#1E3A6E 0%,#2F6FED 55%,#5B93F5 100%);
+  color:#fff; padding:64px 56px 52px; position:relative; overflow:hidden;
+}
+.cover::after{
+  content:""; position:absolute; right:-60px; top:-60px; width:340px; height:340px;
+  border-radius:50%; background:rgba(255,255,255,.07);
+}
+.cover::before{
+  content:""; position:absolute; right:60px; bottom:-130px; width:220px; height:220px;
+  border-radius:50%; background:rgba(255,255,255,.05);
+}
+.cover .kicker{
+  display:inline-block; padding:3px 12px; border:1px solid rgba(255,255,255,.4);
+  border-radius:20px; font-size:12.5px; letter-spacing:2px; margin-bottom:20px;
+}
+.cover h1{font-size:40px;font-weight:600;letter-spacing:5px;line-height:1.3;position:relative}
+.cover .sub{font-size:16px;color:rgba(255,255,255,.86);margin-top:14px;letter-spacing:1px;position:relative}
+.cover .meta{
+  display:flex;gap:36px;margin-top:34px;font-size:13px;position:relative;
+  color:rgba(255,255,255,.78);flex-wrap:wrap;
+}
+.cover .meta b{display:block;color:#fff;font-size:14px;font-weight:500;margin-top:2px}
+
+/* 章节 */
+.sec{padding:44px 56px;border-bottom:1px solid var(--line2)}
+.sec:last-child{border-bottom:none}
+.sec-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border-radius:8px;background:var(--primary-l);
+  color:var(--primary);font-weight:600;font-size:14px;margin-right:12px;
+}
+h2{font-size:22px;font-weight:600;display:flex;align-items:center;margin-bottom:8px}
+h2+.lead{color:var(--ink2);font-size:14px;margin-bottom:26px;padding-left:40px}
+h3{font-size:16px;font-weight:600;margin:26px 0 12px}
+
+/* 一句话定位 */
+.pitch{
+  background:var(--primary-l);border-left:4px solid var(--primary);
+  padding:20px 24px;border-radius:0 8px 8px 0;font-size:16px;line-height:1.9;
+}
+.pitch b{color:var(--primary-d)}
+
+/* 卡片网格 */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.card{
+  border:1px solid var(--line);border-radius:10px;padding:18px 20px;background:#fff;
+}
+.card .ico{
+  width:36px;height:36px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;font-size:18px;margin-bottom:12px;background:var(--side);
+}
+.card h4{font-size:15px;font-weight:600;margin-bottom:6px}
+.card p{font-size:13.5px;color:var(--ink2);line-height:1.75}
+.card .big{
+  font-size:30px;font-weight:600;color:var(--primary);line-height:1.2;
+  font-family:Consolas,monospace;
+}
+.card .big small{font-size:14px;color:var(--ink2);font-weight:400;margin-left:4px}
+
+/* 流程 */
+.flow{display:flex;align-items:stretch;gap:0;margin:24px 0}
+.flow .step{
+  flex:1;text-align:center;padding:16px 12px;position:relative;
+  background:var(--side);border:1px solid var(--line);
+}
+.flow .step:first-child{border-radius:8px 0 0 8px}
+.flow .step:last-child{border-radius:0 8px 8px 0;border-right:1px solid var(--line)}
+.flow .step:not(:last-child){border-right:none}
+.flow .step .n{
+  width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;font-size:12px;
+  font-weight:600;margin-bottom:8px;
+}
+.flow .step h5{font-size:13.5px;font-weight:600;margin-bottom:3px}
+.flow .step p{font-size:12px;color:var(--ink3);line-height:1.6}
+.flow .arrow{
+  display:flex;align-items:center;color:#C5CAD3;font-size:16px;padding:0 2px;
+  background:var(--side);border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:14px 0}
+th{
+  background:var(--side);text-align:left;padding:10px 14px;font-weight:600;
+  border-bottom:2px solid var(--line);color:var(--ink);font-size:13px;
+}
+td{padding:10px 14px;border-bottom:1px solid var(--line2);vertical-align:top;color:var(--ink2)}
+td b{color:var(--ink);font-weight:600}
+tr:hover td{background:#FAFBFC}
+
+/* 对比 */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);
+  border-radius:10px;overflow:hidden;margin:20px 0}
+.cmp>div{padding:18px 22px}
+.cmp .l{background:var(--side);border-right:1px solid var(--line)}
+.cmp .r{background:#fff}
+.cmp h5{font-size:13px;color:var(--ink3);letter-spacing:1px;margin-bottom:12px;
+  text-transform:uppercase;font-weight:600}
+.cmp ul{list-style:none;font-size:13.5px}
+.cmp li{padding:5px 0;color:var(--ink2);padding-left:20px;position:relative}
+.cmp li::before{content:"—";position:absolute;left:0;color:#C5CAD3}
+.cmp .r li{color:var(--ink)}
+.cmp .r li::before{content:"✓";color:var(--ok);font-weight:700}
+
+/* 里程碑 */
+.ms{position:relative;padding-left:34px;margin:22px 0}
+.ms::before{content:"";position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.ms .m{position:relative;margin-bottom:16px}
+.ms .m::before{
+  content:"";position:absolute;left:-30px;top:7px;width:12px;height:12px;
+  border-radius:50%;background:#fff;border:2.5px solid var(--primary);
+}
+.ms .m.done::before{background:var(--ok);border-color:var(--ok)}
+.ms .m h5{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:10px}
+.ms .m h5 .tagm{
+  font-size:11px;padding:1px 8px;border-radius:10px;background:var(--primary-l);
+  color:var(--primary);font-weight:500;
+}
+.ms .m.done h5 .tagm{background:var(--ok-l);color:var(--ok)}
+.ms .m p{font-size:13px;color:var(--ink2);margin-top:3px}
+
+/* 提示条 */
+.callout{
+  padding:16px 20px;border-radius:8px;font-size:14px;line-height:1.85;
+  display:flex;gap:12px;margin:18px 0;
+}
+.callout .ci{font-size:18px;flex-shrink:0;line-height:1.5}
+.callout.info{background:var(--primary-l);border-left:4px solid var(--primary)}
+.callout.warn{background:var(--warn-l);border-left:4px solid var(--warn)}
+.callout.ok{background:var(--ok-l);border-left:4px solid var(--ok)}
+.callout.danger{background:var(--danger-l);border-left:4px solid var(--danger)}
+.callout b{font-weight:600}
+
+/* 文件卡 */
+.files{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+.fcard{
+  border:1px solid var(--line);border-radius:10px;padding:16px 18px;
+  display:flex;gap:14px;align-items:flex-start;
+}
+.fcard .fi{
+  width:40px;height:48px;border-radius:6px;flex-shrink:0;display:flex;
+  align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;
+  letter-spacing:.5px;
+}
+.fcard .fi.md{background:#4B6A9B}
+.fcard .fi.html{background:#E8712A}
+.fcard h5{font-size:14px;font-weight:600;margin-bottom:4px}
+.fcard p{font-size:12.5px;color:var(--ink2);line-height:1.7}
+.fcard .sz{font-size:11.5px;color:var(--ink3);margin-top:6px;font-family:Consolas,monospace}
+
+/* 徽章 */
+.badge{
+  display:inline-block;padding:2px 9px;border-radius:12px;font-size:11.5px;
+  font-weight:500;line-height:1.7;
+}
+.b-blue{background:var(--primary-l);color:var(--primary)}
+.b-green{background:var(--ok-l);color:var(--ok)}
+.b-orange{background:var(--warn-l);color:#B5761A}
+.b-purple{background:var(--purple-l);color:var(--purple)}
+.b-gray{background:var(--side);color:var(--ink2)}
+
+/* 页脚 */
+.foot{padding:32px 56px;background:var(--side);text-align:center;
+  font-size:12.5px;color:var(--ink3)}
+
+@media print{
+  body{background:#fff}
+  .wrap{box-shadow:none;max-width:none}
+  .sec{page-break-inside:avoid}
+}
+@media (max-width:880px){
+  .g2,.g3,.g4,.files,.cmp{grid-template-columns:1fr}
+  .cover,.sec{padding:36px 24px}
+  .flow{flex-direction:column}
+  .flow .step{border-radius:8px!important;border:1px solid var(--line)!important;margin-bottom:6px}
+  .flow .arrow{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ===== 封面 ===== -->
+<div class="cover">
+  <div class="kicker">项目设计总览 · v1.0</div>
+  <h1>手写字迹填充器</h1>
+  <div class="sub">拍下自己的字 → 做成专属字形 → 自动填满空白表格 → 打印出手写效果</div>
+  <div class="meta">
+    <div>参考产品<b>手写数字生成器（¥5 付费）</b></div>
+    <div>本项目形态<b>Python 桌面程序 · 带安装包</b></div>
+    <div>目标平台<b>Windows 10 / 11</b></div>
+    <div>文档日期<b>2026-10-09</b></div>
+  </div>
+</div>
+
+<!-- ===== 1 一句话定位 ===== -->
+<div class="sec">
+  <h2><span class="sec-num">1</span>这个项目要做什么</h2>
+  <div class="lead">一句话说清楚，方便给不参与技术的人看。</div>
+
+  <div class="pitch">
+    基层单位、学校每天要手写大量表格——<b>晨午检表、点名册、签到表</b>。一张 24 行 × 10 列的表格，
+    手写一遍要 20 分钟以上，还容易抄错。<br>
+    这个工具让用户<b>拍几张自己写的字</b>，程序把字形采集下来，之后<b>自动把手写字迹填进空白表格</b>，
+    导出 PDF 直接打印。<b>20 分钟 → 30 秒。</b>
+  </div>
+
+  <div class="grid g4" style="margin-top:24px">
+    <div class="card">
+      <div class="ico">⏱</div>
+      <div class="big">5<span style="font-size:16px">分钟</span></div>
+      <p>采集字形的时间（拍 2 张照片）</p>
+    </div>
+    <div class="card">
+      <div class="ico">🔤</div>
+      <div class="big">12<small>个字符</small></div>
+      <p>数字 0-9 + 逗号 + 句点</p>
+    </div>
+    <div class="card">
+      <div class="ico">📄</div>
+      <div class="big">多页<small>PDF</small></div>
+      <p>一次生成，直接打印</p>
+    </div>
+    <div class="card">
+      <div class="ico">📦</div>
+      <div class="big">一键<small>安装</small></div>
+      <p>标准 Windows 安装包</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 2 用户怎么用 ===== -->
+<div class="sec">
+  <h2><span class="sec-num">2</span>用户的一条完整路径</h2>
+  <div class="lead">全程只有五步，非技术用户照着点就行。</div>
+
+  <div class="flow">
+    <div class="step"><div class="n">1</div><h5>拍照</h5><p>白纸上用黑笔写数字<br>还有逗号和句点</p></div>
+    <div class="arrow">▸</div>
+    <div class="step"><div class="n">2</div><h5>采集</h5><p>抠图 → 框字 → 标注<br>三步向导</p></div>
+    <div class="arrow">▸</div>
+    <div class="step"><div class="n">3</div><h5>选表</h5><p>选一张空白<br>表格 PDF</p></div>
+    <div class="arrow">▸</div>
+    <div class="step"><div class="n">4</div><h5>调参</h5><p>拉格子、调抖动<br>实时看预览</p></div>
+    <div class="arrow">▸</div>
+    <div class="step"><div class="n">5</div><h5>导出</h5><p>生成 PDF<br>直接打印</p></div>
+  </div>
+
+  <div class="callout info">
+    <div class="ci">💡</div>
+    <div><b>关键设计：让"像手写"这件事可控。</b>同一个字在表格里出现 20 次，如果长得一模一样，一眼就看出是机器填的。
+    所以每个字都要有<b>位置偏移、旋转、大小变化、拉伸、倾斜</b>。这些参数分四层给用户调，同时预设「轻微 / 自然 / 明显」三档，
+    不懂参数的人点一下就行。</div>
+  </div>
+</div>
+
+<!-- ===== 3 相比参考产品的改进 ===== -->
+<div class="sec">
+  <h2><span class="sec-num">3</span>我们比参考产品多做了什么</h2>
+  <div class="lead">参考产品售价 ¥5，思路很好，但有几个明显的短板。</div>
+
+  <div class="cmp">
+    <div class="l">
+      <h5>参考产品 · 手写数字生成器</h5>
+      <ul>
+        <li>只能填 0-9 十个数字，小数点都填不了</li>
+        <li>参数全是数字输入框，没有预设</li>
+        <li>没有撤销，点错了只能重来</li>
+        <li>不能保存多套字形</li>
+        <li>每次生成结果都不一样，无法复现</li>
+        <li>要付费 ¥5</li>
+      </ul>
+    </div>
+    <div class="r">
+      <h5>本项目</h5>
+      <ul>
+        <li>数字 + 逗号 + 句点，共 12 个字符（覆盖体检表、成绩表）</li>
+        <li>非技术用户也能上手，全中文提示</li>
+        <li>三档预设 + 四层细调，随需切换</li>
+        <li>录入和框字支持撤销 / 恢复</li>
+        <li>支持多套字形库，随时切换</li>
+        <li>可固定随机种子，同参数同结果</li>
+        <li>免费开源，本地运行</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="ci">⚖️</div>
+    <div><b>合规声明：</b>本项目与「手写数字生成器」<b>没有任何代码层面的关系</b>，
+    只借鉴其公开的产品思路与交互范式。目标是做一个功能更全的免费等效工具，
+    供本人及本单位内部合规使用。<b>严禁用于伪造签名、伪造他人笔迹等违法用途。</b></div>
+  </div>
+</div>
+
+<!-- ===== 4 五个设计决定 ===== -->
+<div class="sec">
+  <h2><span class="sec-num">4</span>五个设计决定（已全部拍板）</h2>
+  <div class="lead">这五条定了，整个方案就能往下走。前三条是 10-09 定的，后两条是本次补充确认的。</div>
+
+  <div class="grid g3">
+    <div class="card">
+      <div class="ico" style="background:var(--primary-l);color:var(--primary)">🖥</div>
+      <h4>做成什么形态？</h4>
+      <p style="margin-bottom:10px"><span class="badge b-blue">已定：Python 桌面程序</span></p>
+      <p>Windows 上的应用程序。图像处理与 PDF 生态在 Python 里最成熟，
+      配一个安装包，用户不需要装任何环境。</p>
+    </div>
+    <div class="card">
+      <div class="ico" style="background:var(--ok-l);color:var(--ok)">📷</div>
+      <h4>字形从哪来？</h4>
+      <p style="margin-bottom:10px"><span class="badge b-green">已定：上传手写照片</span></p>
+      <p>用户在白纸上写好、拍照上传，程序自动抠背景、切分单字、逐个打标签。
+      这样出来的是<b>用户自己的字</b>，不是字库里的通用手写体。</p>
+    </div>
+    <div class="card">
+      <div class="ico" style="background:var(--warn-l);color:#B5761A">👥</div>
+      <h4>给谁用？</h4>
+      <p style="margin-bottom:10px"><span class="badge b-orange">已定：非技术用户</span></p>
+      <p>不会命令行、不懂路径、看到英文报错就慌。所以：<b>界面全中文、每步能返回、
+      危险操作二次确认、宁可多几步也不能报错。</b></p>
+    </div>
+    <div class="card" style="border-color:#C7DAFB;background:#FBFDFF">
+      <div class="ico" style="background:var(--primary-l);color:var(--primary)">🔢</div>
+      <h4>要采多少种字符？</h4>
+      <p style="margin-bottom:10px"><span class="badge b-blue">本次定案：恰好 12 个</span></p>
+      <p>只做 <b>数字 0-9</b> 加 <b>逗号</b> <b>句点</b>。不含字母、不含中文标点。<br>
+      好处很实际：<b>拍 2 张照片、5 分钟就采完</b>，采集界面也简单得多——
+      字符键盘只有一排 12 个键。</p>
+    </div>
+    <div class="card" style="border-color:#C7DAFB;background:#FBFDFF">
+      <div class="ico" style="background:var(--primary-l);color:var(--primary)">📦</div>
+      <h4>怎么交到用户手上？</h4>
+      <p style="margin-bottom:10px"><span class="badge b-blue">本次定案：做安装包</span></p>
+      <p>做成标准的 <b>Windows 安装程序</b>：双击下一步装好、自动建桌面图标、
+      能从控制面板卸载、双击字形库文件直接打开。<br>
+      需要 <b>额外装 Inno Setup</b> 并把打包列入正式交付范围。</p>
+    </div>
+    <div class="card" style="border-style:dashed;opacity:.75">
+      <div class="ico" style="background:var(--side)">❓</div>
+      <h4>还没定的一条</h4>
+      <p style="margin-bottom:10px"><span class="badge b-gray">待确认</span></p>
+      <p><b>工具叫什么名字？</b>暂定「手写字迹填充器」。<br>
+      这个名字会出现在<b>桌面快捷方式、安装程序、卸载列表</b>里，
+      改起来成本高，建议尽早确认。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 5 功能清单 ===== -->
+<div class="sec">
+  <h2><span class="sec-num">5</span>功能清单</h2>
+  <div class="lead">按模块列出，标出优先级。</div>
+
+  <table>
+    <thead>
+      <tr><th style="width:52px">编号</th><th style="width:150px">模块</th><th>做什么</th><th style="width:90px">优先级</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>F1</b></td><td><b>字形库管理</b></td>
+        <td>三步向导新建字形库（抠图 / 框字 / 标注），<b>采集 12 个字符（数字 + 逗号句点）</b>；
+            列表管理、重命名、删除；单个字符补充采集</td>
+        <td><span class="badge b-blue">核心</span></td>
+      </tr>
+      <tr>
+        <td><b>F2</b></td><td><b>模板载入</b></td>
+        <td>支持 PDF（多页）与图片；翻页浏览；「应用到所有页」</td>
+        <td><span class="badge b-blue">核心</span></td>
+      </tr>
+      <tr>
+        <td><b>F3</b></td><td><b>网格标定</b></td>
+        <td>起点 X/Y、列宽、行高、内边距、行列数、参与列勾选；
+            预览图上可视化叠加网格线，可拖拽微调</td>
+        <td><span class="badge b-blue">核心</span></td>
+      </tr>
+      <tr>
+        <td><b>F4</b></td><td><b>内容来源</b></td>
+        <td>随机数字 / 随机区间 / 随机小数 / 手动录入；
+            支持按列设不同规则；从 Excel 直接 Ctrl+V 粘贴</td>
+        <td><span class="badge b-blue">核心</span></td>
+      </tr>
+      <tr>
+        <td><b>F5</b></td><td><b>抖动参数</b></td>
+        <td>四层分区（单元整体 / 单字位置 / 单字形变 / 小数点）；
+            三档预设；随机种子可固定以复现</td>
+        <td><span class="badge b-blue">核心</span></td>
+      </tr>
+      <tr>
+        <td><b>F6</b></td><td><b>实时预览</b></td>
+        <td>参数改动 300ms 内刷新；缩放、翻页、显示网格开关；按住看原图</td>
+        <td><span class="badge b-blue">核心</span></td>
+      </tr>
+      <tr>
+        <td><b>F7</b></td><td><b>导出</b></td>
+        <td>多页 PDF；可选 150/200/300/600 DPI；进度条 + 中途可取消</td>
+        <td><span class="badge b-blue">核心</span></td>
+      </tr>
+      <tr>
+        <td><b>F8</b></td><td><b>项目存取</b></td>
+        <td>保存 / 加载完整填表现场；每 2 分钟自动保存，崩溃可恢复</td>
+        <td><span class="badge b-green">重要</span></td>
+      </tr>
+      <tr>
+        <td><b>F9</b></td><td><b>全局</b></td>
+        <td>内置帮助、异常兜底（不出现英文报错）、日志、首次运行引导</td>
+        <td><span class="badge b-green">重要</span></td>
+      </tr>
+      <tr style="background:#FBFDFF">
+        <td><b>F10</b></td><td><b>安装与卸载</b></td>
+        <td>标准 Windows 安装程序：安装向导、桌面与开始菜单快捷方式、
+            双击字形库文件直接打开、可从控制面板卸载；<b>卸载或升级不丢用户数据</b></td>
+        <td><span class="badge b-blue">交付必需</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== 6 界面长什么样 ===== -->
+<div class="sec">
+  <h2><span class="sec-num">6</span>界面长什么样</h2>
+  <div class="lead">详细原型见 <b>界面原型.html</b>（可在浏览器直接打开，四个屏可切换）。</div>
+
+  <div class="grid g2">
+    <div class="card">
+      <div class="ico" style="background:var(--primary-l);color:var(--primary)">①</div>
+      <h4>首页</h4>
+      <p>三张大卡片：<b>新建字形库 / 我的字形库 / 打开项目</b>。
+      首次使用时第一张最突出；已有字形库则第二张高亮。用户不需要思考"先干什么"。</p>
+    </div>
+    <div class="card">
+      <div class="ico" style="background:var(--primary-l);color:var(--primary)">②</div>
+      <h4>主工作台</h4>
+      <p>左边参数面板、右边实时预览。参数按<b>五个可折叠分组</b>排列，
+      预览图上直接叠加网格线——拖数字就能看见格子动。</p>
+    </div>
+    <div class="card">
+      <div class="ico" style="background:var(--primary-l);color:var(--primary)">③</div>
+      <h4>字形采集向导</h4>
+      <p>顶部步骤条，三步走：<b>抠图</b>（容差滑块 + 实时对比）→
+      <b>框字</b>（自动框选，右键删、拖拽补）→ <b>标注</b>（一排 12 键的字符键盘，批量打标签）。</p>
+    </div>
+    <div class="card">
+      <div class="ico" style="background:var(--primary-l);color:var(--primary)">④</div>
+      <h4>手动录入弹窗</h4>
+      <p>行 × 列 的表格编辑器，支持从 Excel 直接粘贴。
+      <b>没有采集到字形的字符会黄底提示"将跳过"</b>，不会静默丢掉。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 7 技术方案 ===== -->
+<div class="sec">
+  <h2><span class="sec-num">7</span>技术方案（一句话版）</h2>
+  <div class="lead">具体选型理由见《需求文档.md》§9。</div>
+
+  <table>
+    <thead><tr><th style="width:130px">层</th><th style="width:240px">选型</th><th>为什么</th></tr></thead>
+    <tbody>
+      <tr><td><b>界面</b></td><td>PySide6（Qt）</td>
+          <td>原生控件质感好；图形视图框架天生适合做"缩放预览 + 图上编辑"</td></tr>
+      <tr><td><b>图像处理</b></td><td>OpenCV + Pillow</td>
+          <td>抠图、切分、旋转缩放，都是成熟操作</td></tr>
+      <tr><td><b>PDF</b></td><td>PyMuPDF</td>
+          <td>渲染快、能直接在原页上贴图，保留模板的矢量内容</td></tr>
+      <tr><td><b>打包</b></td><td>PyInstaller + Inno Setup</td>
+          <td>先打出程序目录（启动快），再用 Inno Setup 做成带向导的安装包。
+              <b>不用单文件模式</b>——每次启动要解压 200MB，首启要等十几秒</td></tr>
+      <tr><td><b>架构</b></td><td>内核与界面分离</td>
+          <td>填充引擎是纯函数、不依赖界面，可以独立测试；这是控制技术风险的关键</td></tr>
+    </tbody>
+  </table>
+
+  <h3>填充引擎的四个动作（核心逻辑）</h3>
+  <p style="font-size:14px;color:var(--ink2);margin-bottom:14px">
+    对表格里每一个要填的格子，依次做四件事——顺序不能乱：</p>
+  <div class="grid g4">
+    <div class="card" style="border-left:3px solid var(--purple)">
+      <h4 style="font-size:14px">① 单字形变</h4>
+      <p>从字形库随机挑一个"3"，把它<b>缩放、拉伸、旋转、加粗</b>一点
+      ——所以同一个"3"每次长得都不太一样。</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--primary)">
+      <h4 style="font-size:14px">② 单字位置</h4>
+      <p>一个字一个字地平移到位置上，<b>左右上下微错位</b>，字间距也不均匀
+      ——这是手写最明显的特征。</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--ok)">
+      <h4 style="font-size:14px">③ 整格变换</h4>
+      <p>把这一格里的所有字当作一个整体，<b>一起平移、一起转个角度</b>。
+      所以要先把字合成到一张透明图层上再转。</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--warn)">
+      <h4 style="font-size:14px">④ 小数点</h4>
+      <p>小数点这类小符号单独处理，位置和大小有自己的一套随机值，
+      否则会显得太规整。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 8 里程碑 ===== -->
+<div class="sec">
+  <h2><span class="sec-num">8</span>怎么一步步做出来</h2>
+  <div class="lead">每个阶段结束都必须有「能双击运行、能看见结果」的产物。</div>
+
+  <div class="ms">
+    <div class="m">
+      <h5>M1 · 骨架能跑 <span class="tagm">基础</span></h5>
+      <p>窗口打开 → 首页三卡片 → 能跳到子页。配置、日志、异常兜底就位。</p>
+    </div>
+    <div class="m">
+      <h5>M2 · 字形采集全通 <span class="tagm">最重</span></h5>
+      <p>拿一张实拍照片走完三步，导出一个字形库文件，能重新载入。
+      图像处理 + 最复杂的交互控件都在这里。</p>
+    </div>
+    <div class="m">
+      <h5>M3 · 填充内核 <span class="tagm">风险最高</span></h5>
+      <p>命令行跑通：输入模板 + 内容 + 参数 + 字形库 → 输出一张填好的图。
+      <b>在此之前不写任何界面代码。</b></p>
+    </div>
+    <div class="m">
+      <h5>M4 · 主工作台 <span class="tagm">核心体验</span></h5>
+      <p>参数面板 + 实时预览 + 网格可视化。改参数 300ms 内看见变化。</p>
+    </div>
+    <div class="m">
+      <h5>M5 · 内容与导出 <span class="tagm">闭环</span></h5>
+      <p>手动录入、随机生成、多页 PDF 导出、进度条与取消。
+      到这里功能已经完整了。</p>
+    </div>
+    <div class="m">
+      <h5>M6 · 项目与打磨 <span class="tagm">易用性</span></h5>
+      <p>项目保存 / 加载、自动保存防丢、帮助页、首次运行引导。</p>
+    </div>
+    <div class="m">
+      <h5>M7 · 打包与安装包 <span class="tagm">正式交付</span></h5>
+      <p>程序目录 + Inno Setup 安装包 + 一页纸使用说明。
+      <b>必须在没装 Python 的干净机器上实测安装包</b>——本地开发机测不出缺 DLL 的问题。</p>
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <div class="ci">🎯</div>
+    <div><b>整个计划里最重要的一条纪律：</b>M3 内核跑通之前，不写 Qt 界面代码。
+    填充引擎是唯一有技术风险的部分——界面写得再漂亮，内核不对就是全白干。</div>
+  </div>
+</div>
+
+<!-- ===== 9 怎么验收 ===== -->
+<div class="sec">
+  <h2><span class="sec-num">9</span>怎么算做成功了</h2>
+  <div class="lead">除了功能清单逐条打勾，还有一条"人肉验收"标准。</div>
+
+  <div class="grid g2">
+    <div class="card">
+      <div class="ico" style="background:var(--ok-l);color:var(--ok)">✓</div>
+      <h4>功能验收（可测）</h4>
+      <p style="line-height:2">
+        · 用手机拍的 A4 照片走完采集，导出字形库不报错<br>
+        · 24×10 表格填充 + 多页导出，20 页 300DPI 在 30 秒内完成<br>
+        · 同种子两次生成结果<b>完全一致</b><br>
+        · 载入损坏文件时弹中文提示而不是崩溃<br>
+        · 模板放在含中文和空格的路径下也能正常打开
+      </p>
+    </div>
+    <div class="card" style="border-color:#B7E2CD;background:#FBFEFC">
+      <div class="ico" style="background:var(--ok-l);color:var(--ok)">👀</div>
+      <h4>人肉验收（最重要）</h4>
+      <p>把生成的 PDF 打印出来，和真人手写的同类表格<b>并排放在桌上</b>，
+      让一位不知情的同事看 5 秒，问："哪张是手写的？"</p>
+      <p style="margin-top:10px;color:var(--ok);font-weight:600">
+        → 他不能一眼指出来。</p>
+      <p style="margin-top:10px;font-size:12.5px;color:var(--ink3)">
+        如果一眼看穿，说明抖动不足或样本太单一，回去调参数、补样本。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 10 待定问题 ===== -->
+<div class="sec">
+  <h2><span class="sec-num">10</span>问题清单</h2>
+  <div class="lead">三条已经拍板，剩一条建议尽早定。</div>
+
+  <div class="callout ok">
+    <div class="ci">✅</div>
+    <div><b>已定案（本次）：</b>
+      <br>· <b>字符集</b> → 只做「数字 + 逗号 + 句点」，共 12 个字符
+      <br>· <b>安装包</b> → 要做，做成标准 Windows 安装程序，面向同事分发
+      <br><span style="font-size:13px;color:#4A7A5E">这两条已同步更新到需求文档、数据格式规范、实施计划三份文档里，界面原型里的键盘也改成一排 12 键了。</span>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th style="width:52px">#</th><th style="width:220px">问题</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>Q1</b></td>
+        <td><b>工具叫什么名字？</b><br><span class="badge b-orange" style="margin-top:6px;display:inline-block">建议尽早定</span></td>
+        <td>暂定「<b>手写字迹填充器</b>」。这个名字会出现在<b>桌面快捷方式、开始菜单、安装程序标题、控制面板卸载列表</b>里，
+            定下来之后改动要重新打包，成本较高。<br>
+            <span class="badge b-blue" style="margin-top:6px;display:inline-block">备选：手写表格生成器 / 我的字迹填表 / 手写填表助手</span></td>
+      </tr>
+      <tr>
+        <td><b>Q2</b></td>
+        <td><b>要不要支持汉字？</b><br><span class="badge b-gray" style="margin-top:6px;display:inline-block">目前按不做处理</span></td>
+        <td>v1 明确不做。但如果实际用起来发现「填姓名列」的需求压过了「填数值列」，
+            就要换技术路线（整幅手写页切分 + 按字检索），是另一个量级的产品。<br>
+            <span style="color:var(--ink3);font-size:13px">现状：遇到不支持的字符会在界面上明确提示「将跳过」，不会静默丢弃。</span></td>
+      </tr>
+      <tr>
+        <td><b>Q3</b></td>
+        <td><b>要不要深色模式 / 开机自启？</b></td>
+        <td>都建议 v1 不做。深色模式放 v1.1；开机自启对本工具没意义——
+            它是「要用的时候才打开」的类型，常驻只会占内存。</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== 11 已产出的文档 ===== -->
+<div class="sec">
+  <h2><span class="sec-num">11</span>已经产出的文档</h2>
+  <div class="lead">七份文件，都在同一个文件夹里。</div>
+
+  <div class="files">
+    <div class="fcard">
+      <div class="fi md">MD</div>
+      <div>
+        <h5>需求文档.md</h5>
+        <p>13 章，从背景、目标、用户画像到功能需求、界面设计、数据设计、
+           技术选型、风险、验收标准、里程碑。<b>这是主文档。</b></p>
+        <div class="sz">Markdown · 完整需求说明</div>
+      </div>
+    </div>
+    <div class="fcard" style="border-color:#5B8DEF;background:#F7FAFF">
+      <div class="fi md" style="background:#5B8DEF;color:#fff">MD</div>
+      <div>
+        <h5>模块设计说明书.md ★ 新增</h5>
+        <p>把产品切成 <b>11 个模块</b>，逐个写清「负责什么、吃什么、吐什么」——
+           每个接口的完整签名、6 类 17 条跨模块契约、错误传播链路、
+           12 条 Code Review 禁令，还附一页纸模块关系图。<b>开工前必读。</b></p>
+        <div class="sz">Markdown · 怎么拆、怎么接</div>
+      </div>
+    </div>
+    <div class="fcard" style="border-color:#5B8DEF;background:#F7FAFF">
+      <div class="fi md" style="background:#5B8DEF;color:#fff">MD</div>
+      <div>
+        <h5>接口契约与测试用例.md ★ 新增</h5>
+        <p>把每个模块的输入输出边界变成 <b>约 160 条可执行断言</b>（pytest 风格），
+           含一份「假字形库」生成器，让内核能在没有真实素材时就开始开发。
+           <b>每写完一个模块就跑对应那节。</b></p>
+        <div class="sz">Markdown · 怎么证明写对了</div>
+      </div>
+    </div>
+    <div class="fcard">
+      <div class="fi md">MD</div>
+      <div>
+        <h5>数据格式规范.md</h5>
+        <p>三种持久化文件（字形库 / 项目 / 配置）的<b>全部字段定义</b>，
+           含字符编码映射表、单位换算约定、校验规则汇总。</p>
+        <div class="sz">Markdown · 实现依据</div>
+      </div>
+    </div>
+    <div class="fcard">
+      <div class="fi html">HTM</div>
+      <div>
+        <h5>界面原型.html</h5>
+        <p>四个屏的<b>可交互原型</b>：首页、主工作台、采集向导三步、
+           手动录入弹窗。双击用浏览器打开，点顶部标签切换。</p>
+        <div class="sz">HTML · 可直接打开</div>
+      </div>
+    </div>
+    <div class="fcard">
+      <div class="fi md">MD</div>
+      <div>
+        <h5>实施计划.md</h5>
+        <p>七个里程碑的<b>任务拆解</b>、目录结构、每阶段的交付判据、
+           风险预案、每阶段验证清单。</p>
+        <div class="sz">Markdown · 开发路线</div>
+      </div>
+    </div>
+    <div class="fcard">
+      <div class="fi html">HTM</div>
+      <div>
+        <h5>00-总览.html</h5>
+        <p>就是你现在看的这一页。</p>
+        <div class="sz">HTML · 一页看懂</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout info" style="margin-top:24px">
+    <div class="ci">📌</div>
+    <div><b>建议的阅读顺序：</b>
+      先看这份总览了解全貌 → 打开 <b>界面原型.html</b> 看看做出来什么样 →
+      通读 <b>需求文档.md</b> 提意见 → <b>定个工具名字</b> →
+      对着 <b>模块设计说明书.md</b> 和 <b>接口契约与测试用例.md</b> 开工 →
+      按 <b>实施计划.md</b> 的里程碑推进。</div>
+  </div>
+
+  <div class="callout" style="margin-top:14px;background:#F7FAFF;border-color:#D6E4FF">
+    <div class="ci">🧩</div>
+    <div><b>新加两份文档是为了解决一个问题：</b>
+      「需求写了、格式定了，但代码从哪一行开始写、模块之间怎么说话」——
+      模块设计说明书回答「怎么拆、怎么接」，
+      接口契约与测试用例回答「怎么证明写对了」。
+      两者都从同一个原则出发：<b>接口先定，实现后填</b>。</div>
+  </div>
+</div>
+
+<div class="foot">
+  手写字迹填充器 · 项目设计总览 v1.0 ｜ 2026-10-09 ｜
+  配套文档：需求文档 / 模块设计说明书 / 接口契约与测试用例 / 数据格式规范 / 界面原型 / 实施计划
+</div>
+
+</div>
+</body>
+</html>

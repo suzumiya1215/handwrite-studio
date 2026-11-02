@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# 测试与缓存
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 打包产物
+*.spec.bak
+*.exe
+*.msi
+installer_build*.log
+installer_*.log
+gui_smoke.log
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 本地数据（字形库、工程文件、采集样本不随仓库分发）
+*.hwfont
+*.hwpj
+local_data/
+scratch/
